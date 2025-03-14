@@ -77,6 +77,7 @@
                     markerRoot.add(mesh);
                 });
             });
+            
             let patternMarkerRoot = new THREE.Group();
             scene.add(patternMarkerRoot);
             new THREEx.ArMarkerControls(arToolkitContext, patternMarkerRoot, { type: 'pattern', patternUrl: 'data/pattern-image.patt' });
@@ -88,6 +89,7 @@
                 patternSound.setLoop(false);
                 patternSound.setVolume(1.0);
             });
+            
             textureLoader.load('3.jpg', (texture) => {
                 let ratio = texture.image.width / texture.image.height;
                 let geometry = new THREE.PlaneGeometry(ratio, 1);
@@ -96,6 +98,7 @@
                 mesh.rotation.x = -Math.PI / 2;
                 patternMarkerRoot.add(mesh);
             });
+            
             document.addEventListener('click', () => {
                 audioMap.forEach((sound) => {
                     if (sound.context.state === 'suspended') {
@@ -108,9 +111,9 @@
                 requestAnimationFrame(animate);
                 if (arToolkitSource.ready) arToolkitContext.update(arToolkitSource.domElement);
                 
-                barcodeValues.forEach((barcode) => {
-                    let isMarkerVisible = arToolkitContext.arController.barcodeMarkers[barcode]?.inCurrent;
-                    let sound = audioMap.get(barcode);
+                [...barcodeValues, 'pattern-image.patt'].forEach((marker) => {
+                    let isMarkerVisible = arToolkitContext.arController.barcodeMarkers?.[marker]?.inCurrent || arToolkitContext.arController.patternMarkers?.[marker]?.inCurrent;
+                    let sound = audioMap.get(marker);
                     if (isMarkerVisible && sound && !sound.isPlaying) {
                         sound.play();
                     } else if (!isMarkerVisible && sound && sound.isPlaying) {
@@ -125,4 +128,3 @@
     </script>
 </body>
 </html>
-
