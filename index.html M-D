@@ -51,8 +51,8 @@
             
             let markerRoots = [];
             let barcodeValues = [1, 2];
-            let audioFiles = ['1.mp3', '2.mp3', '3.mp3'];
-            let imageFiles = ['1.jpg', '2.jpg', '3.jpg'];
+            let audioFiles = ['1.mp3', '2.mp3'];
+            let imageFiles = ['1.jpg', '2.jpg'];
             
             barcodeValues.forEach((barcode, index) => {
                 let markerRoot = new THREE.Group();
@@ -112,7 +112,7 @@
                 if (arToolkitSource.ready) arToolkitContext.update(arToolkitSource.domElement);
                 
                 [...barcodeValues, 'pattern-image.patt'].forEach((marker) => {
-                    let isMarkerVisible = arToolkitContext.arController.barcodeMarkers?.[marker]?.inCurrent || arToolkitContext.arController.patternMarkers?.[marker]?.inCurrent;
+                    let isMarkerVisible = (marker === 'pattern-image.patt') ? patternMarkerRoot.visible : arToolkitContext.arController.barcodeMarkers?.[marker]?.inCurrent;
                     let sound = audioMap.get(marker);
                     if (isMarkerVisible && sound && !sound.isPlaying) {
                         sound.play();
@@ -128,3 +128,4 @@
     </script>
 </body>
 </html>
+
