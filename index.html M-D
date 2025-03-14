@@ -50,7 +50,7 @@
             arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
             
             let markerRoots = [];
-            let barcodeValues = [1, 2, ];
+            let barcodeValues = [1, 2];
             let audioFiles = ['1.mp3', '2.mp3', '3.mp3'];
             let imageFiles = ['1.jpg', '2.jpg', '3.jpg'];
             
