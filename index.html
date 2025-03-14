@@ -18,9 +18,9 @@
 <body style='margin: 0px; overflow: hidden; font-family: Monospace; user-select: none; pointer-events: none;'>
     <div id="access" style="top: 0; left: 0; right:0; bottom: 0; background: #000; position: absolute; user-select: all; pointer-events: all; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column;">
         <div id="text-wrapper" style="color: #fff; text-transform: uppercase; font-family: Arial, Helvetica, sans-serif; font-weight: 400; line-height: 1.5em; font-size: large;">
-            <a href="https://github.com" style="color: #fff; text-decoration: none; font-size: larger; font-weight: bold;">PRESS HERE</a>
+            <a href="https://github.com" style="color: #fff; text-decoration: none; font-size: larger; font-weight: bold;">Натисніть на екран для отримання доступу</a>
             <br>
-            TO ENTER THE EXPERIENCE
+            до WebAR-буклету "Жакардова машина"
         </div>
     </div>
     <script>
@@ -50,9 +50,9 @@
             arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
             
             let markerRoots = [];
-            let barcodeValues = [1, 2, 3];
-            let audioFiles = ['1.mp3', '2.mp3', '3.mp3'];
-            let imageFiles = ['1.jpg', '2.jpg', '3.jpg'];
+            let barcodeValues = [1, 2];
+            let audioFiles = ['1.mp3', '2.mp3'];
+            let imageFiles = ['1.jpg', '2.jpg'];
             
             barcodeValues.forEach((barcode, index) => {
                 let markerRoot = new THREE.Group();
@@ -78,6 +78,27 @@
                 });
             });
             
+            let patternMarkerRoot = new THREE.Group();
+            scene.add(patternMarkerRoot);
+            new THREEx.ArMarkerControls(arToolkitContext, patternMarkerRoot, { type: 'pattern', patternUrl: 'data/pattern-image.patt' });
+            
+            let patternSound = new THREE.Audio(listener);
+            audioMap.set('pattern-image.patt', patternSound);
+            audioLoader.load('3.mp3', (buffer) => {
+                patternSound.setBuffer(buffer);
+                patternSound.setLoop(false);
+                patternSound.setVolume(1.0);
+            });
+            
+            textureLoader.load('3.jpg', (texture) => {
+                let ratio = texture.image.width / texture.image.height;
+                let geometry = new THREE.PlaneGeometry(ratio, 1);
+                let material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+                let mesh = new THREE.Mesh(geometry, material);
+                mesh.rotation.x = -Math.PI / 2;
+                patternMarkerRoot.add(mesh);
+            });
+            
             document.addEventListener('click', () => {
                 audioMap.forEach((sound) => {
                     if (sound.context.state === 'suspended') {
@@ -90,9 +111,9 @@
                 requestAnimationFrame(animate);
                 if (arToolkitSource.ready) arToolkitContext.update(arToolkitSource.domElement);
                 
-                barcodeValues.forEach((barcode) => {
-                    let isMarkerVisible = arToolkitContext.arController.barcodeMarkers[barcode]?.inCurrent;
-                    let sound = audioMap.get(barcode);
+                [...barcodeValues, 'pattern-image.patt'].forEach((marker) => {
+                    let isMarkerVisible = (marker === 'pattern-image.patt') ? patternMarkerRoot.visible : arToolkitContext.arController.barcodeMarkers?.[marker]?.inCurrent;
+                    let sound = audioMap.get(marker);
                     if (isMarkerVisible && sound && !sound.isPlaying) {
                         sound.play();
                     } else if (!isMarkerVisible && sound && sound.isPlaying) {
